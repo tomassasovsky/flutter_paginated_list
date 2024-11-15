@@ -12,9 +12,10 @@ class PaginatedList<T> extends StatelessWidget {
   /// {@macro paginated_list}
   const PaginatedList({
     super.key,
+    required this.items,
+    this.isLastPage = true,
     this.onTap,
     this.onLoadMore,
-    this.onRemove,
     this.builder,
     this.loadingIndicator = const Padding(
       padding: EdgeInsets.only(bottom: 20),
@@ -24,13 +25,8 @@ class PaginatedList<T> extends StatelessWidget {
         ),
       ),
     ),
-    this.deleteIcon = const Icon(
-      Icons.close,
-      color: Colors.white,
-    ),
     this.physics = const BouncingScrollPhysics(),
     this.scrollDirection = Axis.vertical,
-    this.deleteIconAlignment = Alignment.centerRight,
     this.padding = EdgeInsets.zero,
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
@@ -49,9 +45,6 @@ class PaginatedList<T> extends StatelessWidget {
     this.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     this.semanticChildCount,
     this.listViewKey,
-    required this.items,
-    required this.isRecentSearch,
-    required this.isLastPage,
   });
 
   /// The list of items to display.
@@ -63,26 +56,17 @@ class PaginatedList<T> extends StatelessWidget {
   /// The function that is called when the user requests more items.
   final void Function(int index)? onLoadMore;
 
-  /// The function that is called when the user taps the delete icon.
-  final void Function(T item, int index)? onRemove;
-
   /// The function that is called to build the items of the list.
   final Widget Function(T item, int index)? builder;
 
   /// The widget to display while the list is loading.
   final Widget loadingIndicator;
 
-  /// The icon to display for the delete button.
-  final Widget deleteIcon;
-
   /// The scroll physics to use for the list.
   final ScrollPhysics physics;
 
   /// The scroll direction of the list.
   final Axis scrollDirection;
-
-  /// Whether the list is displaying recent searches.
-  final bool isRecentSearch;
 
   /// Whenever the list is displaying the last page of results.
   final bool isLastPage;
@@ -141,12 +125,9 @@ class PaginatedList<T> extends StatelessWidget {
   /// The padding of the [PaginatedList].
   final EdgeInsetsGeometry padding;
 
-  /// The alignment of the [deleteIcon].
-  final Alignment deleteIconAlignment;
-
   @override
   Widget build(BuildContext context) {
-    final itemCount = items.length + (isRecentSearch || isLastPage ? 0 : 1);
+    final itemCount = items.length + (isLastPage ? 0 : 1);
     return ListView.builder(
       key: listViewKey,
       scrollDirection: scrollDirection,
@@ -193,23 +174,6 @@ class PaginatedList<T> extends StatelessWidget {
                 },
               ),
             ),
-            if (isRecentSearch)
-              Builder(
-                builder: (context) {
-                  final item = items[index];
-                  return Align(
-                    alignment: deleteIconAlignment,
-                    child: IconButton(
-                      onPressed: () {
-                        if (item != null) {
-                          onRemove?.call(item, index);
-                        }
-                      },
-                      icon: deleteIcon,
-                    ),
-                  );
-                },
-              )
           ],
         );
       },

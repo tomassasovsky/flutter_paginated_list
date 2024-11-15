@@ -188,7 +188,7 @@ const results1 = {
       'vote_average': 8.5,
     }
   ],
-  'total_pages': 3
+  'total_pages': 3,
 };
 
 const results2 = {
@@ -375,7 +375,7 @@ const results2 = {
       'vote_average': 8.4,
     }
   ],
-  'total_pages': 3
+  'total_pages': 3,
 };
 
 const results3 = {
@@ -562,5 +562,5 @@ const results3 = {
       'vote_average': 8.4,
     }
   ],
-  'total_pages': 3
+  'total_pages': 3,
 };

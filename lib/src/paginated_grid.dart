@@ -11,14 +11,13 @@ import 'package:visibility_detector/visibility_detector.dart';
 class PaginatedGrid<T> extends StatelessWidget {
   /// {@macro paginated_grid}
   const PaginatedGrid({
+    super.key,
     required this.onLoadMore,
     required this.builder,
     required this.items,
     required this.isLastPage,
     required this.gridDelegate,
-    super.key,
     this.onTap,
-    this.onRemove,
     this.loadingIndicator = const Padding(
       padding: EdgeInsets.only(bottom: 20),
       child: Center(
@@ -27,13 +26,8 @@ class PaginatedGrid<T> extends StatelessWidget {
         ),
       ),
     ),
-    this.deleteIcon = const Icon(
-      Icons.close,
-      color: Colors.white,
-    ),
     this.physics = const BouncingScrollPhysics(),
     this.scrollDirection = Axis.vertical,
-    this.deleteIconAlignment = Alignment.centerRight,
     this.padding = EdgeInsets.zero,
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
@@ -50,7 +44,6 @@ class PaginatedGrid<T> extends StatelessWidget {
     this.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     this.semanticChildCount,
     this.listViewKey,
-    this.isRecentSearch = false,
     this.stackFit = StackFit.passthrough,
   });
 
@@ -63,26 +56,17 @@ class PaginatedGrid<T> extends StatelessWidget {
   /// The function that is called when the user requests more items.
   final dynamic Function() onLoadMore;
 
-  /// The function that is called when the user taps the delete icon.
-  final dynamic Function(T item, int index)? onRemove;
-
   /// The function that is called to build the items of the list.
   final Widget Function(T item, int index) builder;
 
   /// The widget to display while the list is loading.
   final Widget loadingIndicator;
 
-  /// The icon to display for the delete button.
-  final Widget deleteIcon;
-
   /// The scroll physics to use for the list.
   final ScrollPhysics physics;
 
   /// The scroll direction of the list.
   final Axis scrollDirection;
-
-  /// Whether the list is displaying recent searches.
-  final bool isRecentSearch;
 
   /// Whenever the list is displaying the last page of results.
   final bool isLastPage;
@@ -135,9 +119,6 @@ class PaginatedGrid<T> extends StatelessWidget {
   /// The padding of the [PaginatedGrid].
   final EdgeInsetsGeometry padding;
 
-  /// The alignment of the [deleteIcon].
-  final Alignment deleteIconAlignment;
-
   /// The delegate that controls the size and position of the children.
   final SliverGridDelegate gridDelegate;
 
@@ -146,7 +127,7 @@ class PaginatedGrid<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = items.length + (isRecentSearch || isLastPage ? 0 : 1);
+    final itemCount = items.length + (isLastPage ? 0 : 1);
     return GridView.builder(
       key: listViewKey,
       scrollDirection: scrollDirection,
@@ -169,47 +150,26 @@ class PaginatedGrid<T> extends StatelessWidget {
       physics: physics,
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        return Stack(
-          children: [
-            InkWell(
-              onTap: () => onTap?.call(index),
-              child: Builder(
-                builder: (context) {
-                  if (index == items.length) {
-                    return VisibilityDetector(
-                      key: const Key('loading-more'),
-                      onVisibilityChanged: (visibility) {
-                        if (visibility.visibleFraction == 1) {
-                          onLoadMore.call();
-                        }
-                      },
-                      child: loadingIndicator,
-                    );
-                  } else {
-                    final item = items[index];
-                    return builder.call(item, index);
-                  }
-                },
-              ),
-            ),
-            if (isRecentSearch)
-              Builder(
-                builder: (context) {
-                  final item = items[index];
-                  return Align(
-                    alignment: deleteIconAlignment,
-                    child: IconButton(
-                      onPressed: () {
-                        if (item != null) {
-                          onRemove?.call(item, index);
-                        }
-                      },
-                      icon: deleteIcon,
-                    ),
-                  );
-                },
-              )
-          ],
+        return InkWell(
+          onTap: () => onTap?.call(index),
+          child: Builder(
+            builder: (context) {
+              if (index == items.length) {
+                return VisibilityDetector(
+                  key: const Key('loading-more'),
+                  onVisibilityChanged: (visibility) {
+                    if (visibility.visibleFraction == 1) {
+                      onLoadMore.call();
+                    }
+                  },
+                  child: loadingIndicator,
+                );
+              } else {
+                final item = items[index];
+                return builder.call(item, index);
+              }
+            },
+          ),
         );
       },
     );

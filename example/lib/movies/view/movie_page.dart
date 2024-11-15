@@ -280,7 +280,7 @@ class SearchItem extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
