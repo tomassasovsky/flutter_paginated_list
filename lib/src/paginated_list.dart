@@ -151,30 +151,26 @@ class PaginatedList<T> extends StatelessWidget {
       physics: physics,
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        return Stack(
-          children: [
-            InkWell(
-              onTap: () => onTap?.call(index),
-              child: Builder(
-                builder: (context) {
-                  if (index == items.length) {
-                    return VisibilityDetector(
-                      key: const Key('loading-more'),
-                      onVisibilityChanged: (visibility) {
-                        if (visibility.visibleFraction == 1) {
-                          onLoadMore?.call(index);
-                        }
-                      },
-                      child: loadingIndicator,
-                    );
-                  } else {
-                    final item = items[index];
-                    return builder?.call(item, index) ?? const SizedBox();
-                  }
-                },
-              ),
-            ),
-          ],
+        return InkWell(
+          onTap: () => onTap?.call(index),
+          child: Builder(
+            builder: (context) {
+              if (index == items.length) {
+                return VisibilityDetector(
+                  key: const Key('loading-more'),
+                  onVisibilityChanged: (visibility) {
+                    if (visibility.visibleFraction == 1) {
+                      onLoadMore?.call(index);
+                    }
+                  },
+                  child: loadingIndicator,
+                );
+              } else {
+                final item = items[index];
+                return builder?.call(item, index) ?? const SizedBox();
+              }
+            },
+          ),
         );
       },
     );
